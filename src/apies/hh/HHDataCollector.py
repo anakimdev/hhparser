@@ -29,5 +29,5 @@ class HHDataCollector:
         headers = {'Authorization': f'Bearer {self.token}',
                     'User-Agent': self.useragent}
         response = requests.get(url = url, data = data, headers = headers)
-        pprint(response.json())
+        return response.json()
 

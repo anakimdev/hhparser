@@ -4,6 +4,7 @@ from aiogram.filters import Command
 
 from src.bot import configs
 from src.apies.main import create_data_collector
+from src.bot.response_optimizer import optimization_result
 
 router = Router()
 data_collector = create_data_collector()
@@ -26,7 +27,11 @@ async def it(msg: types.Message):
         'per_page': 10,
         'text': profession,
     }
-    response_data = data_collector.get_vacancies(data)
+    results = optimization_result(data_collector.get_vacancies(data))
+    await msg.answer(text="Вывожу вакансии")
+
+    for item in results:
+        await msg.answer(f"{item}")
 
 
 
