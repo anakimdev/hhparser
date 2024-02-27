@@ -1,5 +1,7 @@
 .idea
 venv
 src/bot/configs.py
+src/bot/__pycache__/
 src/apies/hh/configs.py
-
+src/apies/__pycache__/
+srt/apies/hh/__pycache__/
