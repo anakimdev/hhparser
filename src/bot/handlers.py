@@ -3,8 +3,10 @@ from aiogram.types import Message
 from aiogram.filters import Command
 
 from src.bot import configs
+from src.apies.main import create_data_collector
 
 router = Router()
+data_collector = create_data_collector()
 
 @router.message(Command("start"))
 async def start_handler(msg: Message):
@@ -18,7 +20,14 @@ async def help_handler(msg: Message):
 
 @router.message()
 async def it(msg: types.Message):
-    city = msg.text.strip().lower()
-    print(city)
+    profession = msg.text.lower().split()
+    data = {
+        'page': 0,
+        'per_page': 10,
+        'text': profession,
+    }
+    response_data = data_collector.get_vacancies(data)
+
+
 
 
