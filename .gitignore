@@ -1,0 +1,5 @@
+.idea
+venv
+src/bot/configs.py
+src/apies/hh/configs.py
+
