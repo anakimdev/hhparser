@@ -9,6 +9,7 @@ from aiogram.types import BotCommandScopeAllPrivateChats
 from src.bot import configs
 from src.bot.common.bot_cmnd_list import commands_for_users
 from src.bot.handlers.user_private import user_private_router
+from src.bot.handlers.admin import admin_router
 
 
 ALLOWED_UPDATES = ['message, edited_message']
@@ -16,9 +17,9 @@ ALLOWED_UPDATES = ['message, edited_message']
 
 class TelegramBot:
     def __init__(self):
-        self.bot = Bot(token = configs.TELEGRAM_TOKEN, parse_mode = ParseMode.MARKDOWN)
+        self.bot = Bot(token = configs.TELEGRAM_TOKEN, parse_mode = ParseMode.HTML)
         self.dp = Dispatcher(storage = MemoryStorage())
-        self.dp.include_routers(user_private_router)
+        self.dp.include_routers(admin_router, user_private_router, )
 
     async def main(self):
         await self.bot.delete_webhook(drop_pending_updates = True)

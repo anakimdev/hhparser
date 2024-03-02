@@ -11,21 +11,26 @@ user_private_router = Router()
 user_private_router.message.filter(ChatTypeFilter(['private']))
 data_collector = create_data_collector()
 
+
 @user_private_router.message(Command("start"))
 async def start_handler(msg: Message):
     await msg.answer("Привет! Я помогу тебе найти работу!")
+
 
 @user_private_router.message(Command("help"))
 async def help_handler(msg: Message):
     await msg.answer("Пытаюсь вывести помощь")
 
+
 @user_private_router.message(Command("about"))
 async def help_handler(msg: Message):
     await msg.answer("Я помощник в поиске вакансий")
 
+
 @user_private_router.message(Command("payment"))
 async def help_handler(msg: Message):
     await msg.answer("Варианты оплаты")
+
 
 @user_private_router.message(F.text)
 async def it(msg: types.Message):
@@ -36,7 +41,7 @@ async def it(msg: types.Message):
         'text': profession,
     }
     results = optimization_result(data_collector.get_vacancies(data))
-    await msg.answer(text="Вывожу вакансии")
+    await msg.answer(text = "Вывожу вакансии")
 
     num = 0
 
@@ -44,4 +49,4 @@ async def it(msg: types.Message):
         num += 1
         await msg.answer(f"{num}.{item}")
 
-    await msg.answer(text='Чтобы получить ссылку на вакансию введите номер')
+    await msg.answer(text = 'Чтобы получить ссылку на вакансию введите номер')
