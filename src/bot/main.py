@@ -17,7 +17,7 @@ ALLOWED_UPDATES = ['message, edited_message']
 
 class TelegramBot:
     def __init__(self):
-        self.bot = Bot(token = configs.TELEGRAM_TOKEN, parse_mode = ParseMode.HTML)
+        self.bot = Bot(token = configs.TELEGRAM_TOKEN, parse_mode = ParseMode.MARKDOWN)
         self.dp = Dispatcher(storage = MemoryStorage())
         self.dp.include_routers(admin_router, user_private_router, )
 

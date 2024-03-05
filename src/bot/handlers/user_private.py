@@ -1,46 +1,126 @@
 from aiogram import types, Router, F
+from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
-from aiogram.filters import Command
+from aiogram.filters import Command, StateFilter
+from aiogram.fsm.state import State, StatesGroup
 
 from src.bot import configs
 from src.apies.main import create_data_collector
 from src.bot.filters.chat_types import ChatTypeFilter
+from src.bot.keyboards.reply import get_keyboard
 from src.bot.response_optimizer import optimization_result
 
 user_private_router = Router()
 user_private_router.message.filter(ChatTypeFilter(['private']))
 data_collector = create_data_collector()
 
+USERS_KEYBOARD = get_keyboard('Найти вакансии', 'Статистика', 'О нас', 'Варианты оплаты', 'Помощь')
+
+
+class SearchRequest(StatesGroup):
+    name = State()
+    salary = State()
+    region = State()
+
+    texts = {
+        "SearchRequest:name": "Введите профессию заново",
+        "SearchRequest:salary": "Введите зарплату заново",
+        "SearchRequest:region": "Введите регион заново",
+    }
+
+
+# Common commands
 
 @user_private_router.message(Command("start"))
+@user_private_router.message(StateFilter(None), F.text().casefold == 'старт')
 async def start_handler(msg: Message):
-    await msg.answer("Привет! Я помогу тебе найти работу!")
+    await msg.answer("Привет! Я помогу тебе найти работу!", reply_markup = USERS_KEYBOARD)
 
 
 @user_private_router.message(Command("help"))
+@user_private_router.message(StateFilter(None), F.text.casefold == 'помощь')
 async def help_handler(msg: Message):
     await msg.answer("Пытаюсь вывести помощь")
 
 
 @user_private_router.message(Command("about"))
-async def help_handler(msg: Message):
-    await msg.answer("Я помощник в поиске вакансий")
+@user_private_router.message(StateFilter(None), F.text.casefold == 'о нас')
+async def about_handler(msg: Message):
+    await msg.answer("Здесь будет информация о боте")
 
 
 @user_private_router.message(Command("payment"))
-async def help_handler(msg: Message):
-    await msg.answer("Варианты оплаты")
+async def payments_handler(msg: Message):
+    await msg.answer("Здесь будет информация о вариантах оплаты")
 
 
-@user_private_router.message(F.text)
-async def it(msg: types.Message):
-    profession = msg.text.lower().split()
-    data = {
+# Searching FSM
+
+@user_private_router.message(Command('search'))
+@user_private_router.message(StateFilter(None), F.text.casefold() == 'найти вакансии')
+async def start_search_handler(msg: Message, state: FSMContext):
+    await msg.answer('Введите название профессии')
+    await state.set_state(SearchRequest.name)
+
+
+@user_private_router.message(StateFilter('*'), Command('cancel'))
+@user_private_router.message(StateFilter('*'), F.text.casefold() == 'отмена')
+async def cancel_handler(msg: Message, state: FSMContext) -> None:
+    current_state = await state.get_state()
+    if current_state is None:
+        return
+
+    await state.clear()
+    await msg.answer('Все действия отменены', reply_markup = USERS_KEYBOARD)
+
+
+@user_private_router.message(StateFilter('*'), Command('back'))
+@user_private_router.message(StateFilter('*'), F.text.casefold() == 'назад')
+async def step_back_handler(msg: Message, state: FSMContext) -> None:
+    current_state = await state.get_state()
+    if current_state == SearchRequest.name:
+        await msg.answer('Предыдущего шага не предусмотрено. Введите название профессии или нажмите "отмена"')
+        return
+
+    previous = None
+    for step in SearchRequest.__all_states__:
+        if step.state == current_state:
+            await state.set_state(previous)
+            await msg.answer(f"Вы вернулись к прошлому шагу \n{SearchRequest.texts[previous.state]}")
+            return
+        previous = step
+
+
+@user_private_router.message(StateFilter(SearchRequest.name), F.text)
+async def search_name_handler(msg: Message, state: FSMContext):
+    if len(msg.text) > 100:
+        await msg.answer('Введите профессию заново')
+        return
+    await state.update_data(name = msg.text)
+    await msg.answer('Введите среднюю ожидаемую зарплату')
+    await state.set_state(SearchRequest.salary)
+
+
+@user_private_router.message(StateFilter(SearchRequest.salary), F.text)
+async def search_salary_handler(msg: Message, state: FSMContext):
+    await state.update_data(salary = msg.text)
+    await msg.answer('Введите регион для работы.\nДля того, чтобы указать все напишите "Все"')
+    await state.set_state(SearchRequest.region)
+
+
+@user_private_router.message(StateFilter(SearchRequest.region), F.text)
+async def search_region_handler(msg: Message, state: FSMContext):
+    await state.update_data(region = msg.text)
+    await msg.answer('Начинаю поиск. Ожидайте')
+    data = await state.get_data()
+    response_data = {
         'page': 0,
-        'per_page': 3,
-        'text': profession,
+        'per_page': 5,
+        'text': data.get('name'),
+        'salary': int(data.get('salary')),
     }
-    results = optimization_result(data_collector.get_vacancies(data))
+
+    results = optimization_result(data_collector.get_vacancies(response_data))
     await msg.answer(text = "Вывожу вакансии")
 
     num = 0
@@ -49,4 +129,8 @@ async def it(msg: types.Message):
         num += 1
         await msg.answer(f"{num}.{item}")
 
-    await msg.answer(text = 'Чтобы получить ссылку на вакансию введите номер')
+    # await msg.answer(text = 'Чтобы получить ссылку на вакансию введите номер')
+    await state.clear()
+
+
+
