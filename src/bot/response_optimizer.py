@@ -17,16 +17,16 @@ class Vacancy:
 
 def get_salary(item: dict[str]) -> str:
     description = f"Заработная плата:"
-    if item.get('salary') is not None:
-        res = item.get('salary')
-        if res.get('from') is not None and res.get('to') is not None:
-            return f"{description} от {res.get('from')} до {res.get('to')}"
-        elif res.get('from') is not None:
-            return f"{description} от {res.get('from')}"
-        elif res.get('to') is not None:
-            return f"{description} до {res.get('to')}"
-        else:
-            return f"{description} не указано"
+    if item.get('salary') is None:
+        return f"{description} не указано"
+
+    res = item.get('salary')
+    if res.get('from') is not None and res.get('to') is not None:
+        return f"{description} от {res.get('from')} до {res.get('to')}"
+    elif res.get('from') is not None:
+        return f"{description} от {res.get('from')}"
+    elif res.get('to') is not None:
+        return f"{description} до {res.get('to')}"
 
 
 def split_text_into_sentences(text: str) -> list[str]:
@@ -46,8 +46,11 @@ def get_snippet(key: str, description: str, item: dict[str]) -> str:
         return f"\n{description} \n - Не указано"
 
 
-def optimization_result(request_data: dict) -> list[str]:
+def optimization_result(request_data: dict) -> list[str]| str:
     results = None
+
+    if request_data is None:
+        return f'Ничего нет'
 
     for item in request_data.get('items'):
         if results is None:
