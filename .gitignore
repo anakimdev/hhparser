@@ -1,4 +1,5 @@
 .idea
+.env
 venv
 src/bot/configs.py
 src/bot/__pycache__/
