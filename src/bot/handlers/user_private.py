@@ -4,11 +4,11 @@ from aiogram.types import Message
 from aiogram.filters import Command, StateFilter
 from aiogram.fsm.state import State, StatesGroup
 
-from src.bot import configs
 from src.apies.main import create_data_collector
 from src.bot.filters.chat_types import ChatTypeFilter
+from src.bot.keyboards.inline import get_callback_btns
 from src.bot.keyboards.reply import get_keyboard
-from src.bot.response_optimizer import optimization_result
+from src.bot.optimizers.optimizer import get_vacancies, get_vacancy
 
 user_private_router = Router()
 user_private_router.message.filter(ChatTypeFilter(['private']))
@@ -30,7 +30,6 @@ class SearchRequest(StatesGroup):
 
 
 # Common commands
-
 @user_private_router.message(Command("start"))
 @user_private_router.message(StateFilter(None), F.text().casefold == 'старт')
 async def start_handler(msg: Message):
@@ -54,8 +53,9 @@ async def payments_handler(msg: Message):
     await msg.answer("Здесь будет информация о вариантах оплаты")
 
 
-# Searching FSM
 
+
+# Searching FSM
 @user_private_router.message(Command('search'))
 @user_private_router.message(StateFilter(None), F.text.casefold() == 'найти вакансии')
 async def start_search_handler(msg: Message, state: FSMContext):
@@ -112,25 +112,55 @@ async def search_salary_handler(msg: Message, state: FSMContext):
 async def search_region_handler(msg: Message, state: FSMContext):
     await state.update_data(region = msg.text)
     await msg.answer('Начинаю поиск. Ожидайте')
-    data = await state.get_data()
-    response_data = {
+    user_data = await state.get_data()
+
+    request_data = {
         'page': 0,
         'per_page': 5,
-        'text': data.get('name'),
-        'salary': int(data.get('salary')),
+        'text': user_data.get('name'),
+        'salary': int(user_data.get('salary')),
     }
 
-    results = optimization_result(data_collector.get_vacancies(response_data))
+    vacancies = await get_vacancies(request_data)
     await msg.answer(text = "Вывожу вакансии")
 
     num = 0
 
-    for item in results:
+    for vacancy in vacancies:
         num += 1
-        await msg.answer(f"{num}.{item}")
+        data = str(vacancy)
+        link = vacancy.get_link()
 
-    # await msg.answer(text = 'Чтобы получить ссылку на вакансию введите номер')
+        await msg.answer(f"{num}.{data}",
+            reply_markup = get_callback_btns(btns = {
+                "Показать полное описание": f"show_{num}_{link}",
+                "Показать ссылку": f"link_{num}_{link}"
+            }))
+
     await state.clear()
 
 
+@user_private_router.callback_query(F.data.startswith('show_'))
+async def show_full_vacancy(callback: types.CallbackQuery):
+    res = callback.data.split('_')
+    number = res[1]
+    link = res[2]
+    vacancy_id = link.split('/')[-1]
 
+    vacancy = await get_vacancy(vacancy_id)
+
+    await callback.answer('')
+    await callback.message.answer(f"{number}. {vacancy.get_name()}\n\n{str(vacancy)}",
+        reply_markup = get_callback_btns(btns = {
+            "Показать ссылку": f"link_{number}_{link}"
+        }))
+
+
+@user_private_router.callback_query(F.data.startswith('link_'))
+async def show_link(callback: types.CallbackQuery):
+    res = callback.data.split('_')
+    number = res[1]
+    link = res[2]
+
+    await callback.answer('')
+    await callback.message.answer(f'Ccылка для вакансии № {number}: {link}')
