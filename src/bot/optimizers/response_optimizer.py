@@ -1,18 +1,34 @@
 from dataclasses import dataclass
-import re
+from pprint import pprint
+
+from markdown import markdown
+from markdownify import markdownify as md
 
 
 @dataclass
-class Vacancy:
+class VacancyDesc:
     name: str
-    experience: str
-    salary: str
     description: str
-    key_skills: str
     link: str
 
     def __str__(self):
-        return f"{self.name}\n{self.experience}\n{self.salary}\n{self.description}\n{self.key_skills}\n{self.link}"
+        return md(markdown(f"{self.description}"), heading_style = "")
+
+    def get_link(self):
+        return self.link
+
+    def get_name(self):
+        return self.name
+
+
+@dataclass
+class Vacancy(VacancyDesc):
+    experience: str
+    salary: str
+    key_skills: str
+
+    def __str__(self):
+        return md(markdown(f"{self.name}\n{self.experience}\n{self.salary}\n\n{self.description}\n\n{self.key_skills}"))
 
 
 def get_salary(item: dict[str]) -> str:
@@ -41,30 +57,33 @@ def create_text(sentences: list[str]) -> str:
 def get_snippet(key: str, description: str, item: dict[str]) -> str:
     if item.get('snippet').get(key) is not None:
         res = create_text(split_text_into_sentences(item.get('snippet').get(key)))
-        return f"\n{description} \n{res}"
+        return f"{description}\n{res}"
     else:
-        return f"\n{description} \n - Не указано"
+        return f"{description}\n - Не указано"
 
 
-def optimization_result(request_data: dict) -> list[str]| str:
+def make_desc_vacancies(response_data: dict) -> list[Vacancy]:
     results = None
 
-    if request_data is None:
-        return f'Ничего нет'
-
-    for item in request_data.get('items'):
+    for item in response_data.get('items'):
         if results is None:
             results = []
 
-        name = f"Название компании: {item['employer']['name']}"
+        name = f"Компания: {item['employer']['name']}"
         experience = f"Требуемый опыт работы: {item['experience']['name']}"
-
         salary = get_salary(item)
         description = get_snippet('responsibility', 'Особенности работы:', item)
         key_skills = get_snippet('requirement', 'Ключевые навыки:', item)
+        link = item.get('alternate_url')
 
-        link = f"\nСсылка: {item.get('alternate_url')}"
-
-        results.append(Vacancy(name, experience, salary, description, key_skills, link).__str__())
+        results.append(Vacancy(name = name, experience = experience, salary = salary, description = description,
+            key_skills = key_skills, link = link))
 
     return results
+
+
+def make_desc_vacancy(response_data: dict[str]) -> VacancyDesc:
+    name = f"Компания: {response_data['employer']['name']}"
+    description = response_data.get('description')
+    link = response_data.get('alternate_url')
+    return VacancyDesc(name = name, description = description, link = link)
