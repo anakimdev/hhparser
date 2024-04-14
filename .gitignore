@@ -5,4 +5,8 @@ src/bot/configs.py
 src/bot/__pycache__/
 src/apies/hh/configs.py
 src/apies/__pycache__/
-srt/apies/hh/__pycache__/
+src/apies/hh/__pycache__/
+src/apies/company_info/configs.py
+src/apies/company_info/test/
+src/apies/optimizers/configs.py
+src/data

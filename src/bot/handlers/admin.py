@@ -1,21 +1,21 @@
-from aiogram import types, Router, F
-from aiogram.fsm import state
+from aiogram import Router, F
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 from aiogram.filters import Command, StateFilter
 from aiogram.fsm.state import State, StatesGroup
 
-from src.bot import configs
 from src.apies.main import create_data_collector
 from src.bot.filters.chat_types import ChatTypeFilter, IsAdmin
 from src.bot.keyboards.reply import get_keyboard
-from src.bot.response_optimizer import optimization_result
+from src.bot.optimizers.optimizer import get_areas
 
 admin_router = Router()
 admin_router.message.filter(ChatTypeFilter(['private']), IsAdmin())
 data_collector = create_data_collector()
 
-ADMIN_KEYBOARD = get_keyboard('Просмотреть статистику', 'Войти как пользователь', 'Удалить')
+ADMIN_KEYBOARD = get_keyboard('Просмотреть статистику', 'Выполнить запрос', 'Войти как пользователь', 'Удалить')
+ADMIN_DICTIONARY_KEYBOARD = get_keyboard('Справочник полей', 'Справочник ключевых навыков', 'Справочник стран',
+    'Дерево регионов', 'Справочник районов города', 'Отрасли компаний')
 
 
 class Statistics(StatesGroup):
@@ -28,15 +28,19 @@ class Statistics(StatesGroup):
     }
 
 
+class Dictionary(StatesGroup):
+    name = State()
+    action = State()
+
+    text = {
+        'Dictionary:name': 'Введите необходимый справочник',
+        'Dictionary:action': 'Введите необходимое действие'
+    }
+
+
 @admin_router.message(Command("start"))
 async def start_handler(msg: Message):
     await msg.answer("Привет, над чем сегодня поработаем", reply_markup = ADMIN_KEYBOARD)
-
-
-@admin_router.message(StateFilter(None), F.text == "Просмотреть статистику")
-async def start_handler(msg: Message, state: FSMContext):
-    await msg.answer("Гружу статы. Введи профессию", reply_markup = ADMIN_KEYBOARD)
-    await state.set_state(Statistics.name)
 
 
 @admin_router.message(StateFilter('*'), Command('cancel'))
@@ -66,29 +70,27 @@ async def step_back_handler(msg: Message, state: FSMContext) -> None:
             return
         previous = step
 
-@admin_router.message(Statistics.name, F.text)
-async def add_proffesion(msg: Message, state: FSMContext):
-    if len(msg.text) > 100:
-        await msg.answer(f'Слишком длинная профессия.\nВведите заново')
-        return
 
-    await state.update_data(name = msg.text)
-    await msg.answer('Введите регион')
-    await state.set_state(Statistics.region)
+# Статистика
+@admin_router.message(StateFilter(None), F.text == "Просмотреть статистику")
+async def start_stats_handler(msg: Message, state: FSMContext):
+    await msg.answer("Гружу статы. Введи профессию", reply_markup = ADMIN_KEYBOARD)
+    await state.set_state(Statistics.name)
 
 
-@admin_router.message(Statistics.region, F.text)
-async def add_region(msg: Message, state: FSMContext):
-    if len(msg.text) > 100:
-        await msg.answer(f'Слишком длинное название для региона.\nВведите заново')
-        return
+# Запросы по справочным данным
+@admin_router.message(StateFilter(None), F.text == "Выполнить запрос")
+async def start_dictionary_handler(msg: Message, state: FSMContext):
+    await msg.answer('Выбери название справочника', reply_markup = ADMIN_DICTIONARY_KEYBOARD)
+    await state.set_state(Dictionary.name)
 
-    await state.update_data(region = msg.text)
-    data = await state.get_data()
-    await msg.answer(str(data))
-    await state.clear()
+@admin_router.message(StateFilter(Dictionary.name), F.text)
+async def dictionary_action_handler(msg: Message, state:FSMContext):
+    name = F.text
+    request_data = {
+        'locale': 'RU',
+        'host': 'hh.ru'
+    }
 
-
-@admin_router.message(F.text == "Войти как пользователь")
-async def start_handler(msg: Message):
-    await msg.answer("Теперь ты обычный юзер", reply_markup = ADMIN_KEYBOARD)
+    await get_areas(request_data)
+    await msg.answer('Словарь получен')

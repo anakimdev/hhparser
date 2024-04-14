@@ -114,11 +114,13 @@ async def search_region_handler(msg: Message, state: FSMContext):
     await msg.answer('Начинаю поиск. Ожидайте')
     user_data = await state.get_data()
 
+    page = 0
     request_data = {
-        'page': 0,
+        'page': page,
         'per_page': 5,
         'text': user_data.get('name'),
         'salary': int(user_data.get('salary')),
+        'region': user_data.get('region')
     }
 
     vacancies = await get_vacancies(request_data)
@@ -137,6 +139,12 @@ async def search_region_handler(msg: Message, state: FSMContext):
                 "Показать ссылку": f"link_{num}_{link}"
             }))
 
+    await msg.answer('Что делаем дальше?', reply_markup = get_callback_btns(btns = {
+        "Назад": f"back_{page-1}",
+        "Вперед": f"next_{page+1}",
+        "Уведомлять о публикациях": f"watch_{msg.from_user}",
+        "Вернуться в главное меню": f"start"
+    }))
     await state.clear()
 
 
