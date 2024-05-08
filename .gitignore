@@ -10,3 +10,4 @@ src/apies/company_info/configs.py
 src/apies/company_info/test/
 src/apies/optimizers/configs.py
 src/data
+src/apies/company_info/__pycache__/
