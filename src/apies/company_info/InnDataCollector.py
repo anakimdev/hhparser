@@ -1,17 +1,26 @@
-from dataclasses import dataclass
-from bs4 import BeautifulSoup
+from selenium import webdriver
 
-from src.apies.company_info.configs import HTML_PARSER
+from src.helpers.HTMLParser import HTMLParser
+from src.helpers.Finder import Finder
+from src.apies.company_info.configs import TYPE_HTML_PARSER, INN_URL
+
+driver = webdriver.Chrome()
+parser = HTMLParser(driver)
 
 
-@dataclass
 class InnDataCollector:
-    @classmethod
-    def find_inn(cls, html: str) -> str:
-        soup = BeautifulSoup(html, HTML_PARSER)
-        temp = []
-        spans = soup.find('div', id='search').find_all('span')
+    def __init__(self, url: str):
+        self.parser = parser
+        self.finder = None
+        self.url = url
 
+    def collect_inn(self) -> str:
+        return self.normalize_inn(self.find_inn())
+
+    def find_inn(self) -> str:
+        self.__get_html()
+        temp = []
+        spans = self.finder.get_list_by_tag('div', {'id': 'search'}, 'span')
         for item in spans:
             text = item.get_text()
             index = text.find('ИНН')
@@ -26,3 +35,7 @@ class InnDataCollector:
         numbers = '0123456789'
         if string_inn != '':
             return ''.join([char for char in string_inn if char in numbers])
+
+    def __get_html(self):
+        html = self.parser.parse_html_from_page(self.url)
+        self.finder = Finder(html, TYPE_HTML_PARSER)
