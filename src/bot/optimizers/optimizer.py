@@ -20,8 +20,8 @@ async def get_areas(data: dict[str]):
     return await hh_collector.collect_areas(data)
 
 
-def get_company_info(name: str) -> list[str]:
-    inn = inn_collector.collect_inn(name)
-    company = company_collector.collect_company_data(inn)
+async def get_company_info(name: str) -> dict[str, list[str]]:
+    inn = await inn_collector.collect_inn(name)
+    company = await company_collector.collect_company_data(inn)
     return make_desc_company(company)
 

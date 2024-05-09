@@ -4,13 +4,10 @@ from src.helpers.HTMLParser import HTMLParser
 from src.helpers.Finder import Finder
 from src.apies.company_info.configs import TYPE_HTML_PARSER, INN_URL
 
-driver = webdriver.Chrome()
-parser = HTMLParser(driver)
-
 
 class InnDataCollector:
     def __init__(self):
-        self.parser = parser
+        self.parser = None
         self.finder = None
         self.__url = None
 
@@ -23,8 +20,10 @@ class InnDataCollector:
     def url(self, value):
         self.__url = value
 
-    def collect_inn(self, name: str) -> str:
-        return self.normalize_inn(self.find_inn(name))
+    async def collect_inn(self, name: str) -> str:
+        data = self.normalize_inn(self.find_inn(name))
+        self.parser.close_connection()
+        return data
 
     def find_inn(self, name:str) -> str:
         key = f'{name}+инн'
@@ -49,5 +48,7 @@ class InnDataCollector:
             return ''.join([char for char in string_inn if char in numbers])
 
     def __get_html(self):
+        driver = webdriver.Chrome()
+        self.parser = HTMLParser(driver)
         html = self.parser.parse_html_from_page(self.url)
         self.finder = Finder(html, TYPE_HTML_PARSER)
