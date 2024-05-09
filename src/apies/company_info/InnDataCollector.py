@@ -9,16 +9,28 @@ parser = HTMLParser(driver)
 
 
 class InnDataCollector:
-    def __init__(self, url: str):
+    def __init__(self):
         self.parser = parser
         self.finder = None
-        self.url = url
+        self.__url = None
 
-    def collect_inn(self) -> str:
-        return self.normalize_inn(self.find_inn())
+    @property
+    def url(self):
+        if self.__url is not None:
+            return self.__url
 
-    def find_inn(self) -> str:
+    @url.setter
+    def url(self, value):
+        self.__url = value
+
+    def collect_inn(self, name: str) -> str:
+        return self.normalize_inn(self.find_inn(name))
+
+    def find_inn(self, name:str) -> str:
+        key = f'{name}+инн'
+        self.url = f'{INN_URL}q={key}'
         self.__get_html()
+
         temp = []
         spans = self.finder.get_list_by_tag('div', {'id': 'search'}, 'span')
         for item in spans:

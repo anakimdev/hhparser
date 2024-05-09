@@ -17,7 +17,7 @@ class CompanyDataCollector:
         self.parser = parser
         self.inn = None
 
-    def collect_company_data(self, inn: str)-> list[tuple[str, str]]:
+    def collect_company_data(self, inn: str) -> list[tuple[str, str]]:
         return self.get_company_from_html(inn)
 
     def get_company_from_html(self, inn: str) -> list[tuple[str, str]]:
@@ -28,9 +28,9 @@ class CompanyDataCollector:
 
         start_data = data[1:6] + data[8:12]
         middle_data = None
-        if len(data) == 20:
+        if len(data) in range(20, 23):
             middle_data = data[13:17]
-        elif len(data) == 23:
+        elif len(data) >= 23:
             middle_data = data[13:18]
 
         temp_data = start_data + middle_data
@@ -38,8 +38,8 @@ class CompanyDataCollector:
         values = self.normalize_data('div', {'class': 'pb-company-field-value'}, temp_data, True)
         return list(zip(names, values))
 
-    @classmethod
-    def normalize_data(cls, tag: str, attrs: dict[str, str], data: list[str], is_values: bool = False) -> list[str]:
+    @staticmethod
+    def normalize_data(tag: str, attrs: dict[str, str], data: list[str], is_values: bool = False) -> list[str]:
         if is_values:
             return list(map(lambda x: ' '.join(x.find(tag, attrs).text.strip().split()), data))
         else:

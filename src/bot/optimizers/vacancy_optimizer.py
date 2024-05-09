@@ -1,6 +1,4 @@
 from dataclasses import dataclass
-from pprint import pprint
-
 from markdown import markdown
 from markdownify import markdownify as md
 
