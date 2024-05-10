@@ -1,4 +1,4 @@
-import time
+from time import sleep
 
 
 class HTMLParser:
@@ -10,5 +10,8 @@ class HTMLParser:
 
     def __get_html_from_page(self, url: str) -> str:
         self.webdriver.get(url)
-        time.sleep(5)
+        sleep(5)
         return self.webdriver.page_source
+
+    def close_connection(self):
+        self.webdriver.close()

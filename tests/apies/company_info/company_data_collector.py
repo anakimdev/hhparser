@@ -1,5 +1,5 @@
 import unittest
-from src.apies.company_info.CompanyDataCollector import CompanyDataCollector
+from src.apies.company_info.company_data_collector import CompanyDataCollector
 
 
 class CompanyDataCollectorTest(unittest.TestCase):

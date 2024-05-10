@@ -1,4 +1,4 @@
-from src.apies.Response import Response
+from src.helpers.Response import Response
 
 
 class HHDataCollector:
