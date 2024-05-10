@@ -1,5 +1,4 @@
 import asyncio
-from pprint import pprint
 
 from src.apies.main import create_hunter_collector, create_company_collector, create_inn_collector
 from src.bot.optimizers.company_optimizer import make_desc_company
@@ -47,8 +46,3 @@ async def get_company_info(name: str) -> dict[str, list[str]]:
 async def get_vacancy_statistics(name: str):
     vacancies = hh_collector.collect_vacancies({'text': name})
     return vacancies
-
-
-if __name__ == '__main__':
-    vacancy_id = "97746667"
-    print(asyncio.run(get_vacancy(vacancy_id)))

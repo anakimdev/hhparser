@@ -1,7 +1,4 @@
 import re
-import markdown
-from markdownify import markdownify as md
-
 
 def make_responsibility(current_str: str) -> list[str]:
     pattern = '[^\w \(\)\[\]\,\.]+'
@@ -65,3 +62,31 @@ def make_description(current_str: str) -> str:
     current_str = re.sub('[ \n\.\;\:\!\_]+;', ';', current_str)
 
     return current_str
+
+
+def make_salary(item: dict[str]) -> str:
+    salary_info = item.get('salary')
+    if not salary_info:
+        return "Заработная плата: не указано"
+
+    from_salary = salary_info.get('from')
+    to_salary = salary_info.get('to')
+    description = "Заработная плата:"
+
+    if from_salary and to_salary:
+        return f"{description} от {from_salary} до {to_salary}"
+    elif from_salary:
+        return f"{description} от {from_salary}"
+    elif to_salary:
+        return f"{description} до {to_salary}"
+
+    return "Заработная плата: не указано"
+
+
+def split_text_into_sentences(text: str) -> list[str]:
+    return [sentence.lstrip('-').lstrip(' -').strip().capitalize() for sentence in text.split('.') if sentence.strip()]
+
+
+def create_text(sentences: list[str]) -> str:
+    r = ';\n'.join([f" - {sentence}" for sentence in sentences])
+    return f'{r};'
