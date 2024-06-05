@@ -1,4 +1,6 @@
-from sqlalchemy import ForeignKey
+from typing import Optional
+
+from sqlalchemy import ForeignKey, Table, Integer, Column, Index
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from database.models.base import Base, idpk, str_256
@@ -35,3 +37,20 @@ class IndustryTable(Base):
     )
 
 
+class AreaTable(Base):
+    __tablename__ = "areas"
+
+    id: Mapped[idpk]
+    name: Mapped[str]
+    api_id: Mapped[int] = mapped_column(unique=True)
+
+    parent_id: Mapped[Optional[int]] = mapped_column(ForeignKey('areas.api_id'))
+
+    parent: Mapped["AreaTable"] = relationship(
+        backref='children',
+        remote_side='AreaTable.api_id'
+    )
+
+    __table_args__ = (
+        Index('api_index', 'api_id'),
+    )
