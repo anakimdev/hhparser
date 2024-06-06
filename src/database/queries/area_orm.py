@@ -1,9 +1,9 @@
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload, joinedload
 
-from database.core.engine import async_session
-from database.models.dictionaries import AreaTable
-from database.preprocessors.areas import preprocess_areas
+from src.database.core.engine import async_session
+from src.database.models.dictionaries import AreaTable
+from src.database.preprocessors.areas import preprocess_areas
 
 
 class AreaOrm():

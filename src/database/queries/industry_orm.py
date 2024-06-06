@@ -1,9 +1,9 @@
 import json
 
-from database.core.engine import async_session
-from database.models.dictionaries import WorkloadTable, IndustryCategoryTable, IndustryTable
-from database.preprocessors.industries import preprocess_industries
-from database.preprocessors.industry_category import preprocess_industry_categories
+from src.database.core.engine import async_session
+from src.database.models.dictionaries import WorkloadTable, IndustryCategoryTable, IndustryTable
+from src.database.preprocessors.industries import preprocess_industries
+from src.database.preprocessors.industry_category import preprocess_industry_categories
 
 
 class IndustryOrm:

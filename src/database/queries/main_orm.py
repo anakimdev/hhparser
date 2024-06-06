@@ -1,5 +1,5 @@
-from database.core.engine import async_engine
-from database.models.base import Base
+from src.database.core.engine import async_engine
+from src.database.models.base import Base
 
 
 class MainOrm:

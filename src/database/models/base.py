@@ -7,11 +7,12 @@ from sqlalchemy.orm import DeclarativeBase, mapped_column
 
 idpk = Annotated[int, mapped_column(primary_key=True, autoincrement=True)]
 str_256 = Annotated[str, mapped_column(String(256))]
-created_at = Annotated[datetime, mapped_column(server_default=text('TIMEZONE("utc", now())'))]
+created_at = Annotated[datetime, mapped_column(server_default=text("TIMEZONE('utc', now())"))]
 updated_at = Annotated[datetime, mapped_column(
-    server_default=text('TIMEZONE("utc", now())'),
-    onupdate=datetime.utcnow())
-]
+    server_default=text("TIMEZONE('utc', now()) + interval '1 day'"),
+    onupdate=datetime.utcnow)]
+
+
 
 
 class Base(DeclarativeBase):

@@ -3,7 +3,7 @@ from typing import Optional
 from sqlalchemy import ForeignKey, Table, Integer, Column, Index
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from database.models.base import Base, idpk, str_256
+from src.database.models.base import Base, idpk, str_256
 
 
 class WorkloadTable(Base):
@@ -53,4 +53,15 @@ class AreaTable(Base):
 
     __table_args__ = (
         Index('api_index', 'api_id'),
+    )
+
+
+class RolesTable(Base):
+    __tablename__ = "roles"
+
+    id: Mapped[idpk]
+    title: Mapped[str_256]
+
+    users: Mapped[list["UsersTable"]] = relationship(
+        back_populates='role'
     )

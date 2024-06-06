@@ -1,5 +1,5 @@
-from database.core.engine import async_session
-from database.models.dictionaries import WorkloadTable
+from src.database.core.engine import async_session
+from src.database.models.dictionaries import WorkloadTable
 
 
 class WorkloadOrm():
