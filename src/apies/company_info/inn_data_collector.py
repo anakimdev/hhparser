@@ -1,7 +1,6 @@
-from selenium import webdriver
-
-from src.helpers.HTMLParser import HTMLParser
-from src.helpers.Finder import Finder
+from src.apies.company_info.driver import driver
+from src.helpers.html_parser import HTMLParser
+from src.helpers.finder import Finder
 from src.apies.company_info.configs import TYPE_HTML_PARSER, INN_URL
 
 
@@ -21,9 +20,9 @@ class InnDataCollector:
         self.__url = value
 
     async def collect_inn(self, name: str) -> str:
-        data = self.normalize_inn(self.find_inn(name))
-        self.parser.close_connection()
-        return data
+        data = self.find_inn(name)
+        normalize_data = self.normalize_inn(data)
+        return normalize_data
 
     def find_inn(self, name:str) -> str:
         key = f'{name}+инн'
@@ -48,7 +47,6 @@ class InnDataCollector:
             return ''.join([char for char in string_inn if char in numbers])
 
     def __get_html(self):
-        driver = webdriver.Chrome()
         self.parser = HTMLParser(driver)
         html = self.parser.parse_html_from_page(self.url)
         self.finder = Finder(html, TYPE_HTML_PARSER)

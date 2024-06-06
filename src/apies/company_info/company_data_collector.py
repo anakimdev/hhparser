@@ -1,8 +1,7 @@
-from selenium import webdriver
-
+from src.apies.company_info.driver import driver
 from src.apies.company_info.configs import TYPE_HTML_PARSER, FNS_URL, FNS_SEARCH_URL
-from src.helpers.Finder import Finder
-from src.helpers.HTMLParser import HTMLParser
+from src.helpers.finder import Finder
+from src.helpers.html_parser import HTMLParser
 
 
 class CompanyDataCollector:
@@ -29,6 +28,8 @@ class CompanyDataCollector:
             middle_data = data[13:17]
         elif len(data) >= 23:
             middle_data = data[13:18]
+        elif len(data) < 20:
+            middle_data = data[13:len(data)]
 
         temp_data = start_data + middle_data
         names = self.normalize_data('div', {'class': 'pb-company-field-name'}, temp_data)
@@ -43,7 +44,7 @@ class CompanyDataCollector:
             return list(map(lambda x: x.find(tag, attrs).text.strip().replace(':', ''), data))
 
     def __get_company_html(self):
-        driver = webdriver.Chrome()
+        driver.switch_to.new_window()
         self.parser = HTMLParser(driver)
         temp_fns = self.parser.parse_html_from_page(url=f'{FNS_SEARCH_URL}queryAll={self.inn}')
         self.finder = Finder(temp_fns, TYPE_HTML_PARSER)

@@ -4,7 +4,9 @@ import os
 
 from dotenv import find_dotenv, load_dotenv
 
-from src.bot.middlewares.db import DatabaseSessionMiddleware
+from bot.handlers.company.company_router import company_router
+from bot.handlers.vacancies.vacancies_router import vacancies_router
+from bot.middlewares.db import DatabaseSessionMiddleware
 
 load_dotenv(find_dotenv())
 
@@ -13,11 +15,11 @@ from aiogram.enums.parse_mode import ParseMode
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.types import BotCommandScopeAllPrivateChats
 
-from src.bot import configs
-from src.bot.common.bot_cmnd_list import commands_for_users
-from src.bot.handlers.user_private import user_private_router
-from src.bot.handlers.admin import admin_router
-from src.database.engine import create_db, drop_db, session_maker
+from bot import configs
+from bot.common.bot_cmnd_list import commands_for_users
+from bot.handlers.user_private import user_private_router
+from bot.handlers.admin import admin_router
+# from database.engine import create_db, drop_db, session_maker
 
 ALLOWED_UPDATES = ['message, edited_message', 'callback_query', ]
 
@@ -26,17 +28,17 @@ class TelegramBot:
     def __init__(self):
         self.bot = Bot(token = configs.TELEGRAM_TOKEN, parse_mode = ParseMode.HTML)
         self.dp = Dispatcher(storage = MemoryStorage())
-        self.dp.include_routers(admin_router, user_private_router, )
+        self.dp.include_routers(admin_router, user_private_router)
 
-    async def on_startup(self):
-        db_active = False
-        if db_active:
-            await drop_db()
-
-        await create_db()
-
-    async def on_shutdown(self):
-        print('Бот лег')
+    # async def on_startup(self):
+    #     # db_active = False
+    #     # if db_active:
+    #     #     await drop_db()
+    #     #
+    #     await create_db()
+    #
+    # async def on_shutdown(self):
+    #     print('Бот лег')
 
     async def main(self):
         # self.dp.startup.register(self.on_startup)
