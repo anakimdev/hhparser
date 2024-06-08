@@ -1,4 +1,4 @@
-from database.preprocessors.preprocessor import IPreprocessor
+from src.database.preprocessors.preprocessor import IPreprocessor
 
 
 class ProfessionCategoryPreprocessor(IPreprocessor):

@@ -1,9 +1,9 @@
 import json
 from abc import abstractmethod, ABC
 
-from database.preprocessors.areas import AreaPreprocessor
-from database.preprocessors.industries import IndustryPreprocessor, IndustryCategoryPreprocessor
-from database.preprocessors.professions import ProfessionPreprocessor, ProfessionCategoryPreprocessor
+from src.database.preprocessors.areas import AreaPreprocessor
+from src.database.preprocessors.industries import IndustryPreprocessor, IndustryCategoryPreprocessor
+from src.database.preprocessors.professions import ProfessionPreprocessor, ProfessionCategoryPreprocessor
 
 strategies = {
     'area': AreaPreprocessor,
