@@ -3,11 +3,14 @@ from abc import abstractmethod, ABC
 
 from database.preprocessors.areas import AreaPreprocessor
 from database.preprocessors.industries import IndustryPreprocessor, IndustryCategoryPreprocessor
+from database.preprocessors.professions import ProfessionPreprocessor, ProfessionCategoryPreprocessor
 
 strategies = {
     'area': AreaPreprocessor,
     'industry': IndustryPreprocessor,
     'industry_category': IndustryCategoryPreprocessor,
+    'profession': ProfessionPreprocessor,
+    'profession_category': ProfessionCategoryPreprocessor
 }
 
 class IPreprocessor(ABC):
