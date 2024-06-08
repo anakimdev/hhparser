@@ -1,23 +1,26 @@
-import json
+from database.preprocessors.preprocessor import IPreprocessor
 
 
-def preprocess_industries():
-    industries = []
-    links = {}
-    idx = 1
+class IndustryCategoryPreprocessor(IPreprocessor):
+    def preprocess(self, data):
+        categories = [el['name'] for el in data]
+        return categories
 
-    with open('data/industries.json', 'r') as f:
-        data = json.load(f)
 
-    for category in data:
-        links[category['id']] = idx
-        idx += 1
+class IndustryPreprocessor(IPreprocessor):
+    def preprocess(self, data):
+        industries = []
+        links = {}
+        idx = 1
 
-    for category in data:
-        for industry in category['industries']:
-            industries.append({
-                'name': industry['name'],
-                'category_id': links[industry['id'].split('.')[0]]
-            })
-    return industries
+        for category in data:
+            links[category['id']] = idx
+            idx += 1
 
+        for category in data:
+            for industry in category['industries']:
+                industries.append({
+                    'name': industry['name'],
+                    'category_id': links[industry['id'].split('.')[0]]
+                })
+        return industries

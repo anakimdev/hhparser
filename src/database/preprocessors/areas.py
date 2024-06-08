@@ -1,7 +1,8 @@
-import json
+from database.preprocessors.preprocessor import IPreprocessor
 
-def preprocess_areas():
-    def flatten_areas(areas:list, parent_id=None):
+
+class AreaPreprocessor(IPreprocessor):
+    def flatten_areas(self, areas: list, parent_id=None):
         result = []
         for area in areas:
             area_dict = {
@@ -14,12 +15,10 @@ def preprocess_areas():
                 area_dict['parent_id'] = None
             result.append(area_dict)
             if area['areas']:
-                result.extend(flatten_areas(area['areas'], area['id']))
+                result.extend(self.flatten_areas(area['areas'], area['id']))
         return result
 
-    with open('data/areas.json', 'r') as f:
-        data = json.load(f)
+    def preprocess(self, data):
+        result = self.flatten_areas(data)
+        return result
 
-    result = flatten_areas(data)
-
-    return result
