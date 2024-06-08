@@ -6,7 +6,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from src.database.models.base import Base, idpk, str_256
 
 
-class WorkloadTable(Base):
+class WorkloadsTable(Base):
     __tablename__ = "workloads"
 
     id: Mapped[idpk]
@@ -14,30 +14,30 @@ class WorkloadTable(Base):
     title: Mapped[str_256]
 
 
-class IndustryCategoryTable(Base):
+class IndustryCategoriesTable(Base):
     __tablename__ = "industry_categories"
 
     id: Mapped[idpk]
     name: Mapped[str]
 
-    industries: Mapped[list["IndustryTable"]] = relationship(
+    industries: Mapped[list["IndustriesTable"]] = relationship(
         back_populates="category"
     )
 
 
-class IndustryTable(Base):
+class IndustriesTable(Base):
     __tablename__ = "industries"
 
     id: Mapped[idpk]
     name: Mapped[str]
     category_id: Mapped[int] = mapped_column(ForeignKey("industry_categories.id"))
 
-    category: Mapped["IndustryCategoryTable"] = relationship(
+    category: Mapped["IndustryCategoriesTable"] = relationship(
         back_populates="industries"
     )
 
 
-class AreaTable(Base):
+class AreasTable(Base):
     __tablename__ = "areas"
 
     id: Mapped[idpk]
@@ -46,7 +46,7 @@ class AreaTable(Base):
 
     parent_id: Mapped[Optional[int]] = mapped_column(ForeignKey('areas.api_id'))
 
-    parent: Mapped["AreaTable"] = relationship(
+    parent: Mapped["AreasTable"] = relationship(
         backref='children',
         remote_side='AreaTable.api_id'
     )
