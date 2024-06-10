@@ -13,8 +13,6 @@ updated_at = Annotated[datetime, mapped_column(
     onupdate=datetime.utcnow)]
 
 
-
-
 class Base(DeclarativeBase):
     repr_cols_num = 3
     repr_cols = ()

@@ -21,7 +21,7 @@ class IndustryCategoriesTable(Base):
     name: Mapped[str]
 
     industries: Mapped[list["IndustriesTable"]] = relationship(
-        back_populates="category"
+        back_populates="category",
     )
 
 
@@ -33,7 +33,7 @@ class IndustriesTable(Base):
     category_id: Mapped[int] = mapped_column(ForeignKey("industry_categories.id"))
 
     category: Mapped["IndustryCategoriesTable"] = relationship(
-        back_populates="industries"
+        back_populates="industries",
     )
 
 
@@ -46,13 +46,13 @@ class AreasTable(Base):
 
     parent_id: Mapped[Optional[int]] = mapped_column(ForeignKey('areas.api_id'))
 
-    parent: Mapped["AreasTable"] = relationship(
-        backref='children',
-        remote_side='AreaTable.api_id'
+    vacancies: Mapped[list["VacanciesTable"]] = relationship(
+        back_populates="area",
+        remote_side=[api_id],
     )
 
     __table_args__ = (
-        Index('api_index', 'api_id'),
+        Index('area_api_idx', 'api_id'),
     )
 
 
@@ -63,5 +63,5 @@ class RolesTable(Base):
     title: Mapped[str_256]
 
     users: Mapped[list["UsersTable"]] = relationship(
-        back_populates='role'
+        back_populates='role',
     )
