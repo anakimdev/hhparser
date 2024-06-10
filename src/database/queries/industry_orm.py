@@ -9,8 +9,9 @@ from src.database.preprocessors.configs import INDUSTRY_FILE
 class IndustryOrm:
     @staticmethod
     async def insert_industry_categories():
+        prepare_data = await Preprocessor.preprocess(INDUSTRY_FILE, 'industry_category')
         categories = [IndustryCategoriesTable(name=category) for category in
-                      Preprocessor.preprocess(INDUSTRY_FILE, 'industry_category')]
+                      prepare_data]
 
         async with async_session() as session:
             session.add_all(categories)
@@ -19,7 +20,7 @@ class IndustryOrm:
     @staticmethod
     async def insert_industries():
         async with async_session() as session:
-            data = Preprocessor.preprocess(INDUSTRY_FILE, 'industry')
+            data = await Preprocessor.preprocess(INDUSTRY_FILE, 'industry')
             industries = []
 
             for industry in data:

@@ -8,11 +8,12 @@ from src.database.models.common_dicts import AreasTable
 
 
 class AreaOrm:
+
     @staticmethod
     async def insert_areas():
         async with async_session() as session:
             areas = []
-            data = Preprocessor.preprocess(AREAS_FILE, 'area')
+            data = await Preprocessor.preprocess(AREAS_FILE, 'area')
             for area in data:
                 if area['parent_id']:
                     areas.append(AreasTable(parent_id=area['parent_id'], name=area['name'], api_id=area['api_id']))
