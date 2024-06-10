@@ -1,7 +1,8 @@
 from sqlalchemy import select
 
 from src.database.core.engine import async_session
-from src.database.models.users import UsersTable, UserTemplatesTable
+from src.database.models.user_models.users import UsersTable
+from src.database.models.user_models.user_templates import UserTemplatesTable
 from src.database.schemas_dto.user_dto import UsersTemplatesDTO, UsersAddDTO, UsersTemplatesAddDTO, UsersDTO
 
 
