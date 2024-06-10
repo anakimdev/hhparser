@@ -13,12 +13,12 @@ class ProfessionsTable(Base):
 
     categories: Mapped[list["ProfessionCategoriesTable"]] = relationship(
         back_populates="professions",
-        secondary="professions_and_categories"
+        secondary="professions_and_categories",
     )
 
     vacancies: Mapped[list["VacanciesTable"]] = relationship(
         back_populates="professional_roles",
-        secondary="professions_and_vacancies"
+        secondary="professions_and_vacancies",
     )
 
     __table_args__ = (
