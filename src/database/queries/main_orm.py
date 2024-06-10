@@ -3,7 +3,6 @@ from src.database.models.base import Base
 
 
 class MainOrm:
-
     @staticmethod
     async def create_tables():
         async with async_engine.begin() as conn:
