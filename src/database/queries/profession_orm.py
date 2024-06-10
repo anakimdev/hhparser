@@ -36,7 +36,7 @@ class ProfessionOrm:
         return res
 
     @staticmethod
-    async def get_all_categories_by_api_ids(api_ids: list[int], session: AsyncSession | None = None):
+    async def get_all_categories_by_api_ids(api_ids: list[int], session: AsyncSession):
         query = (
             select(ProfessionCategoriesTable)
             .filter(ProfessionCategoriesTable.api_id.in_(api_ids))
@@ -94,3 +94,12 @@ class ProfessionOrm:
                 result = res.scalars().first()
                 return result
 
+    @staticmethod
+    async def get_all_professions_by_api_ids(api_ids: list[int], session: AsyncSession):
+        query = (
+            select(ProfessionsTable)
+            .filter(ProfessionsTable.api_id.in_(api_ids))
+        )
+
+        res = await session.scalars(query)
+        return res.all()
